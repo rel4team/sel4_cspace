@@ -1,6 +1,6 @@
 pub mod zombie;
 
-use sel4_common::{MASK, plus_define_bitfield, sel4_config::*, utils::pageBitsForSize};
+use sel4_common::{plus_define_bitfield, sel4_config::*, utils::pageBitsForSize, MASK};
 
 #[repr(C)]
 #[derive(Clone, Copy, Debug)]
@@ -42,11 +42,21 @@ pub enum CapTag {
     CapFrameCap = 1,
     CapPageTableCap = 3,
     CapASIDControlCap = 11,
-    CapASIDPoolCap = 13
+    CapASIDPoolCap = 13,
 }
 
 /// cap_t 表示一个capability，由两个机器字组成，包含了类型、对象元数据以及指向内核对象的指针。
 /// 每个类型的capability的每个字段都实现了get和set方法。
+/// 
+/// 记录在阅读代码段过程中用到的`cap`的特定字段含义：
+/// 
+/// ```
+/// untyped_cap:
+///  - capFreeIndex：从capPtr到可用的块的偏移，单位是2^seL4_MinUntypedBits大小的块数。如果seL4_MinUntypedBits是4，那么2^seL4_MinUntypedBits就是16字节。如果一个64字节的内存块已经分配了前32字节，则CapFreeIndex会存储2，因为已经使用了2个16字节的块。
+///  - capBlockSize：当前untyped块中剩余空间大小
+/// endpoint_cap:
+///  - capEPBadge：当使用Mint方法创建一个新的endpoint_cap时，可以设置badge，用于表示派生关系，例如一个进程可以与多个进程通信，为了判断消息究竟来自哪个进程，就可以使用badge区分。
+/// ```
 plus_define_bitfield! {
     cap_t, 2, 0, 59, 5 => {
         new_null_cap, CapTag::CapNullCap as usize => {},
@@ -115,7 +125,6 @@ plus_define_bitfield! {
     }
 }
 
-
 /// cap 的公用方法
 impl cap_t {
     pub fn update_data(&self, preserve: bool, new_data: usize) -> Self {
@@ -155,14 +164,12 @@ impl cap_t {
                 new_cap.set_cnode_guard_size(guard_size);
                 new_cap
             }
-            _ => { self.clone() }
+            _ => self.clone(),
         }
     }
 
     pub fn get_cap_type(&self) -> CapTag {
-        unsafe {
-            core::mem::transmute::<u8, CapTag>(self.get_type() as u8)
-        }
+        unsafe { core::mem::transmute::<u8, CapTag>(self.get_type() as u8) }
     }
 
     pub fn get_cap_ptr(&self) -> usize {
@@ -176,12 +183,11 @@ impl cap_t {
             CapTag::CapFrameCap => self.get_frame_base_ptr(),
             CapTag::CapPageTableCap => self.get_pt_base_ptr(),
             CapTag::CapASIDPoolCap => self.get_asid_pool(),
-            _ => {
-                0
-            }
+            _ => 0,
         }
     }
 
+    /// 获得每一个`cap`管理的对象的大小
     pub fn get_cap_size_bits(&self) -> usize {
         match self.get_cap_type() {
             CapTag::CapUntypedCap => self.get_untyped_block_size(),
@@ -193,21 +199,30 @@ impl cap_t {
             _ => 0,
         }
     }
-
+    /// 判断是否该`cap`是否与内存地址绑定，对应的对象是否占用内存空间，`get_cap_ptr`中下列`cap`均有指针指向内存地址，
+    /// 所以下面这些指针都是`physical`的
     pub fn get_cap_is_physical(&self) -> bool {
         match self.get_cap_type() {
-            CapTag::CapUntypedCap | CapTag::CapEndpointCap | CapTag::CapNotificationCap | CapTag::CapCNodeCap | CapTag::CapFrameCap | CapTag::CapASIDPoolCap |
-            CapTag::CapPageTableCap | CapTag::CapZombieCap | CapTag::CapThreadCap => true,
+            CapTag::CapUntypedCap
+            | CapTag::CapEndpointCap
+            | CapTag::CapNotificationCap
+            | CapTag::CapCNodeCap
+            | CapTag::CapFrameCap
+            | CapTag::CapASIDPoolCap
+            | CapTag::CapPageTableCap
+            | CapTag::CapZombieCap
+            | CapTag::CapThreadCap => true,
             _ => false,
         }
     }
-
+    /// 判断该`Cap`是否与架构相关，如`CapPageTableCap`因为不同架构页表不同，该`cap`明显与架构有关
     pub fn isArchCap(&self) -> bool {
         self.get_cap_type() as usize % 2 != 0
     }
 }
 
 
+/// 判断两个cap指向的内核对象是否是同一个内存区域
 pub fn same_region_as(cap1: &cap_t, cap2: &cap_t) -> bool {
     match cap1.get_cap_type() {
         CapTag::CapUntypedCap => {
@@ -232,7 +247,10 @@ pub fn same_region_as(cap1: &cap_t, cap2: &cap_t) -> bool {
             }
             false
         }
-        CapTag::CapEndpointCap | CapTag::CapNotificationCap | CapTag::CapPageTableCap | CapTag::CapASIDPoolCap
+        CapTag::CapEndpointCap
+        | CapTag::CapNotificationCap
+        | CapTag::CapPageTableCap
+        | CapTag::CapASIDPoolCap
         | CapTag::CapThreadCap => {
             if cap2.get_cap_type() == cap1.get_cap_type() {
                 return cap1.get_cap_ptr() == cap2.get_cap_ptr();
@@ -252,14 +270,10 @@ pub fn same_region_as(cap1: &cap_t, cap2: &cap_t) -> bool {
             }
             false
         }
-        CapTag::CapIrqControlCap => {
-            match cap2.get_cap_type() {
-                CapTag::CapIrqControlCap | CapTag::CapIrqHandlerCap => {
-                    true
-                }
-                _ => false
-            }
-        }
+        CapTag::CapIrqControlCap => match cap2.get_cap_type() {
+            CapTag::CapIrqControlCap | CapTag::CapIrqHandlerCap => true,
+            _ => false,
+        },
         CapTag::CapIrqHandlerCap => {
             if cap2.get_cap_type() == CapTag::CapIrqHandlerCap {
                 return cap1.get_irq_handler() == cap2.get_irq_handler();
@@ -272,12 +286,16 @@ pub fn same_region_as(cap1: &cap_t, cap2: &cap_t) -> bool {
     }
 }
 
-/// 判断两个cap指向的内核对象是否是同一个内存区域
+/// 判断两个cap是否指向同一个内核对象，或者内核对象是否在同一块内存区域
+/// 
+/// 当`cap1`为`UntypedCap`时，如果两者指向同一块内存区域，那会进行`setUntypedCapAsFull`操作，那就可以当做是不同的内核对象。
 pub fn same_object_as(cap1: &cap_t, cap2: &cap_t) -> bool {
     if cap1.get_cap_type() == CapTag::CapUntypedCap {
         return false;
     }
-    if cap1.get_cap_type() == CapTag::CapIrqControlCap && cap2.get_cap_type() == CapTag::CapIrqHandlerCap {
+    if cap1.get_cap_type() == CapTag::CapIrqControlCap
+        && cap2.get_cap_type() == CapTag::CapIrqHandlerCap
+    {
         return false;
     }
     if cap1.isArchCap() && cap2.isArchCap() {
@@ -290,11 +308,12 @@ fn arch_same_object_as(cap1: &cap_t, cap2: &cap_t) -> bool {
     if cap1.get_cap_type() == CapTag::CapFrameCap && cap2.get_cap_type() == CapTag::CapFrameCap {
         return cap1.get_frame_base_ptr() == cap2.get_frame_base_ptr()
             && cap1.get_frame_size() == cap2.get_frame_size()
-            && (cap1.get_frame_is_device() == 0) == (cap2.get_frame_is_device() == 0)
+            && (cap1.get_frame_is_device() == 0) == (cap2.get_frame_is_device() == 0);
     }
     same_region_as(cap1, cap2)
 }
 
+/// 判断一个`capability`是否是可撤销的
 pub fn is_cap_revocable(derived_cap: &cap_t, src_cap: &cap_t) -> bool {
     if derived_cap.isArchCap() {
         return false;
@@ -319,6 +338,6 @@ pub fn is_cap_revocable(derived_cap: &cap_t, src_cap: &cap_t) -> bool {
             return true;
         }
 
-        _ => false
+        _ => false,
     }
 }

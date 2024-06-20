@@ -1,7 +1,6 @@
-use sel4_common::MASK;
-use sel4_common::sel4_config::wordRadix;
 use crate::cte::cte_t;
-
+use sel4_common::sel4_config::wordRadix;
+use sel4_common::MASK;
 
 use super::{cap_t, CapTag};
 
@@ -37,9 +36,9 @@ impl cap_t {
         let ptr = self.get_zombie_id() & !MASK!(radix + 1);
         self.set_zombie_id(ptr | (n & MASK!(radix + 1)));
     }
-
 }
 
+///创建一个新的`Zombie Cap`
 #[inline]
 pub fn Zombie_new(number: usize, _type: usize, ptr: usize) -> cap_t {
     let mask: usize;
@@ -55,6 +54,9 @@ pub fn ZombieType_ZombieCNode(n: usize) -> usize {
     return n & MASK!(wordRadix);
 }
 
+
+///判断是否为循环`zombie cap`,指向自身且类型为`CapZombieCap`（似乎只有`CNode Capability`指向自己才会出现这种情况）
+/// 根据网上信息，当`cnode cap`为L2以上时，即`CNode`嵌套`CNode`的情况，就会产生`CyclicZombie`
 #[inline]
 #[no_mangle]
 pub fn capCyclicZombie(cap: &cap_t, slot: *mut cte_t) -> bool {
