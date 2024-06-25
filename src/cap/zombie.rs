@@ -7,7 +7,10 @@ use super::{cap_t, CapTag};
 pub const ZombieType_ZombieTCB: usize = 1usize << wordRadix;
 pub const TCB_CNODE_RADIX: usize = 4;
 
-/// zombie cap相关字段和方法
+//! zombie cap相关字段和方法
+//! 当`tcb_cap`和`cnode_cap`删除的过程中会变为`zombie_cap`
+//! 
+
 impl cap_t {
     #[inline]
     pub fn get_zombie_bit(&self) -> usize {

@@ -15,6 +15,8 @@ use sel4_common::{
     MASK,
 };
 
+//! `CSpace Table Entry`相关操作的具体实现，包含`cte`链表的插入删除等。
+
 #[repr(C)]
 #[derive(Clone, Copy)]
 pub struct deriveCap_ret {
