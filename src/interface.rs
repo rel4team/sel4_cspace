@@ -1,4 +1,5 @@
-//! 提供给外部使用的接口函数
+//! This module used contains interfaces provided to external modules.
+
 pub use super::cap::CapTag;
 pub use super::cap::{cap_t, same_object_as};
 pub use super::cap_rights::seL4_CapRights_t;

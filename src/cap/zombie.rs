@@ -7,6 +7,7 @@ use sel4_common::MASK;
 
 use super::{cap_t, CapTag};
 
+/// Judge whether the zombie cap is from tcb cap.
 pub const ZombieType_ZombieTCB: usize = 1usize << wordRadix;
 pub const TCB_CNODE_RADIX: usize = 4;
 
@@ -41,7 +42,7 @@ impl cap_t {
     }
 }
 
-///创建一个新的`Zombie Cap`
+///create a new zombie cap
 #[inline]
 pub fn Zombie_new(number: usize, _type: usize, ptr: usize) -> cap_t {
     let mask: usize;

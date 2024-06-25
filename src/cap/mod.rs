@@ -29,7 +29,7 @@ impl CNodeCapData {
     }
 }
 
-/// Cap 在内核态中的种类枚举
+/// All types of caps;
 #[derive(Eq, PartialEq, Debug)]
 pub enum CapTag {
     CapNullCap = 0,
@@ -61,6 +61,7 @@ pub enum CapTag {
 /// endpoint_cap:
 ///  - capEPBadge：当使用Mint方法创建一个新的endpoint_cap时，可以设置badge，用于表示派生关系，例如一个进程可以与多个进程通信，为了判断消息究竟来自哪个进程，就可以使用badge区分。
 /// ```
+/// Represent a capability, composed by two words. Different cap can contain different bit fields.
 plus_define_bitfield! {
     cap_t, 2, 0, 59, 5 => {
         new_null_cap, CapTag::CapNullCap as usize => {},
@@ -290,9 +291,11 @@ pub fn same_region_as(cap1: &cap_t, cap2: &cap_t) -> bool {
     }
 }
 
-/// 判断两个cap是否指向同一个内核对象，或者内核对象是否在同一块内存区域
+/// Check whether two caps point to the same kernel object, if not,
+///  whether two kernel objects use the same memory region.
 /// 
-/// 当`cap1`为`UntypedCap`时，如果两者指向同一块内存区域，那会进行`setUntypedCapAsFull`操作，那就可以当做是不同的内核对象。
+/// A special case is that cap2 is a untyped_cap derived from cap1, in this case, cap1 will excute
+/// setUntypedCapAsFull, so you can assume cap1 and cap2 are different.
 pub fn same_object_as(cap1: &cap_t, cap2: &cap_t) -> bool {
     if cap1.get_cap_type() == CapTag::CapUntypedCap {
         return false;

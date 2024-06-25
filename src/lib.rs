@@ -11,10 +11,7 @@ mod cte;
 mod mdb;
 mod structures;
 
-/// 需要外部实现的接口
 pub mod deps;
-/// 暴露给外部的接口
 pub mod interface;
 
-/// 兼容c风格的接口，后续会删除
 pub mod compatibility;

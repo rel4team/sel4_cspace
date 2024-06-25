@@ -25,7 +25,7 @@ pub struct deriveCap_ret {
     pub cap: cap_t,
 }
 
-/// 由cap_t和 mdb_node 组成，是CSpace的基本组成单元
+/// capability table entry, composed by cap and mdb.
 #[repr(C)]
 #[derive(Clone, Copy, Default)]
 pub struct cte_t {
@@ -353,9 +353,8 @@ impl cte_t {
     }
 }
 
-/// 将一个cap插入slot中并维护能力派生树
-///
-/// 将一个new_cap插入到dest slot中并作为src slot的派生子节点插入派生树中
+
+/// insert a new cap into dest_slot and set src_slot's next is dest_slot.
 pub fn cte_insert(new_cap: &cap_t, src_slot: &mut cte_t, dest_slot: &mut cte_t) {
     let srcMDB = &mut src_slot.cteMDBNode;
     let srcCap = &(src_slot.cap.clone());
@@ -386,7 +385,7 @@ pub fn cte_insert(new_cap: &cap_t, src_slot: &mut cte_t, dest_slot: &mut cte_t) 
 }
 
 
-///向`parent`之后插入一个新的`slot`，`slot`的`capability`为`cap`
+/// insert a new cap to slot, set parent's next is slot.
 pub fn insert_new_cap(parent: &mut cte_t, slot: &mut cte_t, cap: &cap_t) {
     let next = parent.cteMDBNode.get_next();
     slot.cap = cap.clone();
@@ -403,9 +402,7 @@ pub fn insert_new_cap(parent: &mut cte_t, slot: &mut cte_t, cap: &cap_t) {
     parent.cteMDBNode.set_next(slot as *const cte_t as usize);
 }
 
-/// 将一个cap插入slot中并删除原节点
-///
-/// 将一个new_cap插入到dest slot中并作为替代src slot在派生树中的位置
+/// move new cap into dest_slot and set src_slot's next is dest_slot
 pub fn cte_move(new_cap: &cap_t, src_slot: &mut cte_t, dest_slot: &mut cte_t) {
     /* Haskell error: "cteInsert to non-empty destination" */
     assert_eq!(dest_slot.cap.get_cap_type(), CapTag::CapNullCap);
@@ -433,7 +430,7 @@ pub fn cte_move(new_cap: &cap_t, src_slot: &mut cte_t, dest_slot: &mut cte_t) {
     }
 }
 
-/// 交换两个slot，并将新的cap数据填入
+/// swap two slots, set slot1.cap is cap2 , slot2.cap is cap1.
 pub fn cte_swap(cap1: &cap_t, slot1: &mut cte_t, cap2: &cap_t, slot2: &mut cte_t) {
     let mdb1 = slot1.cteMDBNode;
     let mdb2 = slot2.cteMDBNode;
@@ -513,6 +510,8 @@ fn setUntypedCapAsFull(srcCap: &cap_t, newCap: &cap_t, srcSlot: &mut cte_t) {
 /// 从cspace寻址特定的slot
 ///
 /// 从给定的cnode、cap index、和depth中找到对应cap的slot，成功则返回slot指针，失败返回找到的最深的cnode
+/// 
+/// Parse cap_ptr ,get a capbility from cnode.
 #[allow(unreachable_code)]
 pub fn resolve_address_bits(
     node_cap: &cap_t,
