@@ -1,3 +1,5 @@
+//! `CSpace Table Entry`相关操作的具体实现，包含`cte`链表的插入删除等。
+
 use super::{
     cap::{cap_t, is_cap_revocable, same_object_as, same_region_as, CapTag},
     deps::{finaliseCap, post_cap_deletion, preemptionPoint},
@@ -15,7 +17,6 @@ use sel4_common::{
     MASK,
 };
 
-//! `CSpace Table Entry`相关操作的具体实现，包含`cte`链表的插入删除等。
 
 #[repr(C)]
 #[derive(Clone, Copy)]

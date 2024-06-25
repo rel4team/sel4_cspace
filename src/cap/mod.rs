@@ -1,9 +1,10 @@
+//! 该模块定义了几乎全部的`capability`，可以在`sel4_common`中找到`plus_define_bitfield!`宏的具体实现，
+//! 该宏在生成`capability`的同时，会生成每个字段的`get``set`方法
+
 pub mod zombie;
 
 use sel4_common::{plus_define_bitfield, sel4_config::*, utils::pageBitsForSize, MASK};
 
-//! 该模块定义了几乎全部的`capability`，可以在`sel4_common`中找到`plus_define_bitfield!`宏的具体实现，
-//! 该宏在生成`capability`的同时，会生成每个字段的`get``set`方法
 
 #[repr(C)]
 #[derive(Clone, Copy, Debug)]
