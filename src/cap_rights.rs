@@ -1,6 +1,8 @@
 use sel4_common::plus_define_bitfield;
 
 const seL4_CapRightsBits: usize = 4;
+
+/// seL4_CapRights is used in syscall map, set the mapped page's rights.
 plus_define_bitfield! {
     seL4_CapRights_t, 1, 0, 0, 0 => {
         new, 0 => {
@@ -12,12 +14,9 @@ plus_define_bitfield! {
     }
 }
 
-
 impl seL4_CapRights_t {
     #[inline]
     pub fn from_word(word: usize) -> Self {
-        Self {
-            words: [word]
-        }
+        Self { words: [word] }
     }
 }
