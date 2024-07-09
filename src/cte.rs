@@ -481,7 +481,7 @@ fn setUntypedCapAsFull(srcCap: &cap_t, newCap: &cap_t, srcSlot: &mut cte_t) {
 /// 从cspace寻址特定的slot
 ///
 /// 从给定的cnode、cap index、和depth中找到对应cap的slot，成功则返回slot指针，失败返回找到的最深的cnode
-/// 
+///
 /// Parse cap_ptr ,get a capbility from cnode.
 #[allow(unreachable_code)]
 pub fn resolve_address_bits(
