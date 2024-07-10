@@ -74,6 +74,23 @@ plus_define_bitfield! {
     }
 }
 
+impl cap_t {
+    pub fn get_cap_ptr(&self) -> usize {
+        match self.get_cap_type() {
+            CapTag::CapUntypedCap => self.get_untyped_ptr(),
+            CapTag::CapEndpointCap => self.get_ep_ptr(),
+            CapTag::CapNotificationCap => self.get_nf_ptr(),
+            CapTag::CapCNodeCap => self.get_cnode_ptr(),
+            CapTag::CapThreadCap => self.get_tcb_ptr(),
+            CapTag::CapZombieCap => self.get_zombie_ptr(),
+            CapTag::CapFrameCap => self.get_frame_base_ptr(),
+            CapTag::CapPageTableCap => self.get_pt_base_ptr(),
+            CapTag::CapASIDPoolCap => self.get_asid_pool(),
+            _ => 0,
+        }
+    }
+}
+
 /// Cap 在内核态中的种类枚举
 #[derive(Eq, PartialEq, Debug)]
 pub enum CapTag {
