@@ -141,21 +141,6 @@ impl cap_t {
         unsafe { core::mem::transmute::<u8, CapTag>(self.get_type() as u8) }
     }
 
-    pub fn get_cap_ptr(&self) -> usize {
-        match self.get_cap_type() {
-            CapTag::CapUntypedCap => self.get_untyped_ptr(),
-            CapTag::CapEndpointCap => self.get_ep_ptr(),
-            CapTag::CapNotificationCap => self.get_nf_ptr(),
-            CapTag::CapCNodeCap => self.get_cnode_ptr(),
-            CapTag::CapThreadCap => self.get_tcb_ptr(),
-            CapTag::CapZombieCap => self.get_zombie_ptr(),
-            CapTag::CapFrameCap => self.get_frame_base_ptr(),
-            CapTag::CapPageTableCap => self.get_pt_base_ptr(),
-            CapTag::CapASIDPoolCap => self.get_asid_pool(),
-            _ => 0,
-        }
-    }
-
     pub fn get_cap_size_bits(&self) -> usize {
         match self.get_cap_type() {
             CapTag::CapUntypedCap => self.get_untyped_block_size(),
