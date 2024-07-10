@@ -32,10 +32,10 @@ plus_define_bitfield! {
     cap_t, 2, 0, 59, 5 => {
         new_null_cap, CapTag::CapNullCap as usize => {},
         new_untyped_cap, CapTag::CapUntypedCap as usize => {
-            capFreeIndex, get_untyped_free_index, set_untyped_free_index, 1, 25, 39, 0, false,
+            capFreeIndex, get_untyped_free_index, set_untyped_free_index, 1, 16, 48, 0, false,
             capIsDevice, get_untyped_is_device, set_untyped_is_device, 1, 6, 1, 0, false,
             capBlockSize, get_untyped_block_size, set_untyped_block_size, 1, 0, 6, 0, false,
-            capPtr, get_untyped_ptr, set_untyped_ptr, 0, 0, 39, 0, true
+            capPtr, get_untyped_ptr, set_untyped_ptr, 0, 0, 48, 0, true
         },
         new_endpoint_cap, CapTag::CapEndpointCap as usize => {
             capEPBadge, get_ep_badge, set_ep_badge, 1, 0, 64, 0, false,
@@ -43,13 +43,13 @@ plus_define_bitfield! {
             capCanGrant, get_ep_can_grant, set_ep_can_grant, 0, 57, 1, 0, false,
             capCanSend, get_ep_can_send, set_ep_can_send, 0, 55, 1, 0, false,
             capCanReceive, get_ep_can_receive, set_ep_can_receive, 0, 56, 1, 0, false,
-            capEPPtr, get_ep_ptr, set_ep_ptr, 0, 0, 39, 0, true
+            capEPPtr, get_ep_ptr, set_ep_ptr, 0, 0, 48, 0, true
         },
         new_notification_cap, CapTag::CapNotificationCap as usize => {
             capNtfnBadge, get_nf_badge, set_nf_badge, 1, 0, 64, 0, false,
             capNtfnCanReceive, get_nf_can_receive, set_nf_can_receive, 0, 58, 1, 0, false,
             capNtfnCanSend, get_nf_can_send, set_nf_can_send, 0, 57, 1, 0, false,
-            capNtfnPtr, get_nf_ptr, set_nf_ptr, 0, 0, 39, 0, true
+            capNtfnPtr, get_nf_ptr, set_nf_ptr, 0, 0, 48, 0, true
         },
         new_reply_cap, CapTag::CapReplyCap as usize => {
             capReplyCanGrant, get_reply_can_grant, set_reply_can_grant, 0, 1, 1, 0, false,
@@ -60,10 +60,10 @@ plus_define_bitfield! {
             capCNodeRadix, get_cnode_radix, set_cnode_radix, 0, 47, 6, 0, false,
             capCNodeGuardSize, get_cnode_guard_size, set_cnode_guard_size, 0, 53, 6, 0, false,
             capCNodeGuard, get_cnode_guard, set_cnode_guard, 1, 0, 64, 0, false,
-            capCNodePtr, get_cnode_ptr, set_cnode_ptr, 0, 0, 38, 1, true
+            capCNodePtr, get_cnode_ptr, set_cnode_ptr, 0, 0, 47, 1, true
         },
         new_thread_cap, CapTag::CapThreadCap as usize => {
-            capTCBPtr, get_tcb_ptr, set_tcb_ptr, 0, 0, 39, 0, true
+            capTCBPtr, get_tcb_ptr, set_tcb_ptr, 0, 0, 48, 0, true
         },
         new_irq_control_cap, CapTag::CapIrqControlCap as usize => {},
         new_irq_handler_cap, CapTag::CapIrqHandlerCap as usize => {
