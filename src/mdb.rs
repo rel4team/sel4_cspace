@@ -6,7 +6,7 @@ use sel4_common::plus_define_bitfield;
 //
 // firstbadged：表示此能力是否是具有相同对象和相同类型的一组能力中的第一个被赋予badge的能力。
 
-#[cfg(target_arch="riscv64")]
+#[cfg(target_arch = "riscv64")]
 plus_define_bitfield! {
     mdb_node_t, 2, 0, 0, 0 => {
         new, 0 => {
@@ -18,7 +18,7 @@ plus_define_bitfield! {
     }
 }
 
-#[cfg(target_arch="aarch64")]
+#[cfg(target_arch = "aarch64")]
 plus_define_bitfield! {
     mdb_node_t, 2, 0, 0, 0 => {
         new, 0 => {
