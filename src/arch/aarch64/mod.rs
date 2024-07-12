@@ -87,19 +87,19 @@ plus_define_bitfield! {
             capPTMappedASID, get_pt_mapped_asid, set_pt_mapped_asid, 1, 48, 16, 0, false,
             capPTBasePtr, get_pt_base_ptr, set_pt_base_ptr, 1, 0, 48, 0, true,
             capPTIsMapped, get_pt_is_mapped, set_pt_is_mapped, 0, 48, 1, 0, false,
-            capPTMappedAddress, get_pt_mapped_address, set_pt_mapped_address, 0, 20, 28, 0, false
+            capPTMappedAddress, get_pt_mapped_address, set_pt_mapped_address, 0, 20, 28, 0, true
         },
         new_page_directory_cap, CapTag::CapPageDirectoryCap as usize => {
             capPDMappedASID, get_pd_mapped_asid, set_pd_mapped_asid, 1, 48, 16, 0, false,
             capPDBasePtr, get_pd_base_ptr, set_pd_base_ptr, 1, 0, 48, 0, true,
             capPDIsMapped, get_pd_is_mapped, set_pd_is_mapped, 0, 48, 1, 0, false,
-            capPDMappedAddress, get_pd_mapped_address, set_pd_mapped_address, 0, 29, 19, 0, false
+            capPDMappedAddress, get_pd_mapped_address, set_pd_mapped_address, 0, 29, 19, 0, true
         },
         new_page_upper_directory_cap, CapTag::CapPageUpperDirectoryCap as usize => {
             capPUDMappedASID, get_pud_mapped_asid, set_pud_mapped_asid, 1, 48, 16, 0, false,
             capPUDBasePtr, get_pud_base_ptr, set_pud_base_ptr, 1, 0, 48, 0, true,
             capPUDIsMapped, get_pud_is_mapped, set_pud_is_mapped, 0, 58, 1, 0, false,
-            capPUDMappedAddress, get_pud_mapped_address, set_pud_mapped_address, 0, 48, 10, 0, false
+            capPUDMappedAddress, get_pud_mapped_address, set_pud_mapped_address, 0, 48, 10, 0, true
         },
         new_page_global_directory_cap, CapTag::CapPageGlobalDirectoryCap as usize => {
             capPGDMappedASID, get_pgd_mapped_asid, set_pgd_mapped_asid, 1, 48, 16, 0, false,

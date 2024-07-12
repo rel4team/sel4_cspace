@@ -64,7 +64,7 @@ plus_define_bitfield! {
             capPTMappedASID, get_pt_mapped_asid, set_pt_mapped_asid, 1, 48, 16, 0, false,
             capPTBasePtr, get_pt_base_ptr, set_pt_base_ptr, 1, 9, 39, 0, true,
             capPTIsMapped, get_pt_is_mapped, set_pt_is_mapped, 0, 39, 1, 0, false,
-            capPTMappedAddress, get_pt_mapped_address, set_pt_mapped_address, 0, 0, 39, 0, false
+            capPTMappedAddress, get_pt_mapped_address, set_pt_mapped_address, 0, 0, 39, 0, true
         },
         new_asid_control_cap, CapTag::CapASIDControlCap as usize => {},
         new_asid_pool_cap, CapTag::CapASIDPoolCap as usize => {
