@@ -133,6 +133,21 @@ impl cap_t {
             _ => 0,
         }
     }
+
+    #[inline]
+    pub fn is_vtable_root(&self) -> bool {
+        self.get_cap_type() == CapTag::CapPageGlobalDirectoryCap
+    }
+
+    #[inline]
+    pub fn is_valid_native_root(&self) -> bool {
+        self.is_vtable_root() && self.get_pgd_is_mapped() != 0
+    }
+
+    #[inline]
+    pub fn is_valid_vtable_root(&self) -> bool {
+        self.is_valid_native_root()
+    }
 }
 
 impl cte_t {
