@@ -109,7 +109,8 @@ plus_define_bitfield! {
         new_asid_control_cap, CapTag::CapASIDControlCap as usize => {},
         new_asid_pool_cap, CapTag::CapASIDPoolCap as usize => {
             capASIDBase, get_asid_base, set_asid_base, 0, 43, 16, 0, false,
-            capASIDPool, get_asid_pool, set_asid_pool, 0, 0, 37, 2, true
+            // FIXED: asid_pool need to shift left 11 bits.
+            capASIDPool, get_asid_pool, set_asid_pool, 0, 0, 37, 11, true
         }
     }
 }
