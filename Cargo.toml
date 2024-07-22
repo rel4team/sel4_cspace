@@ -4,5 +4,5 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-sel4_common = { git = "https://github.com/rel4team/sel4_common.git", branch = "mi_dev" }
+sel4_common = { git = "https://github.com/rel4team/sel4_common.git", branch = "feature/test-check" }
 riscv = { git = "https://github.com/rcore-os/riscv", features = ["inline-asm"] }
