@@ -265,7 +265,8 @@ pub fn arch_same_region_as(cap1: &cap_t, cap2: &cap_t) -> bool {
             }
         }
         CapTag::CapPageGlobalDirectoryCap => {
-            if cap2.get_cap_type() == CapTag::CapPageUpperDirectoryCap {
+            // FIXED: Here should be CapTag::CapPageGlobalDirectoryCap
+            if cap2.get_cap_type() == CapTag::CapPageGlobalDirectoryCap {
                 return cap1.get_pgd_base_ptr() == cap2.get_pgd_base_ptr();
             }
         }

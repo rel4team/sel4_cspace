@@ -26,7 +26,7 @@ pub struct deriveCap_ret {
 
 /// 由cap_t和 mdb_node 组成，是CSpace的基本组成单元
 #[repr(C)]
-#[derive(Clone, Copy, Default)]
+#[derive(Clone, Copy, Default, Debug)]
 pub struct cte_t {
     pub cap: cap_t,
     pub cteMDBNode: mdb_node_t,
@@ -92,7 +92,6 @@ impl cte_t {
         if !same_region_as(&self.cap, &next.cap) {
             return false;
         }
-
         match self.cap.get_cap_type() {
             CapTag::CapEndpointCap => {
                 assert_eq!(next.cap.get_cap_type(), CapTag::CapEndpointCap);
@@ -288,12 +287,26 @@ impl cte_t {
         exception_t::EXCEPTION_NONE
     }
 
+    #[cfg(target_arch = "riscv64")]
     #[inline]
     fn get_volatile_value(&self) -> usize {
         unsafe {
             let raw_value = ptr::read_volatile((self.get_ptr() + 24) as *const usize);
             let mut value = ((raw_value >> 2) & MASK!(37)) << 2;
             if (value & (1usize << 38)) != 0 {
+                value |= 0xffffff8000000000;
+            }
+            value
+        }
+    }
+
+    #[cfg(target_arch = "aarch64")]
+    #[inline]
+    fn get_volatile_value(&self) -> usize {
+        unsafe {
+            let raw_value = ptr::read_volatile((self.get_ptr() + 24) as *const usize);
+            let mut value = ((raw_value >> 2) & MASK!(46)) << 2;
+            if (value & (1usize << 46)) != 0 {
                 value |= 0xffffff8000000000;
             }
             value
