@@ -222,22 +222,6 @@ pub fn arch_mask_cap_rights(rights: seL4_CapRights_t, cap: &cap_t) -> cap_t {
     }
 }
 
-// pub fn Arch_finaliseCap(cap: &cap_t, final_: bool) -> finaliseCap_ret {
-//     match cap.get_cap_type() {
-//         CapTag::CapASIDPoolCap => {
-//             if final_ {
-//                 let asid = cap.get_asid_base();
-//                 deleteASID()
-//             }
-//         }
-//         _ => panic!(),
-//     }
-//     finaliseCap_ret {
-//         remainder: cap_t::new_null_cap(),
-//         cleanupInfo: cap_t::new_null_cap(),
-//     }
-// }
-
 pub fn arch_same_region_as(cap1: &cap_t, cap2: &cap_t) -> bool {
     match cap1.get_cap_type() {
         CapTag::CapFrameCap => {
