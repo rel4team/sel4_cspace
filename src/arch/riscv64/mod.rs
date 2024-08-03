@@ -150,7 +150,7 @@ pub fn arch_mask_cap_rights(rights: seL4_CapRights_t, cap: &cap_t) -> cap_t {
         vm_rights = maskVMRights(vm_rights, rights);
         let mut new_cap = cap.clone();
         new_cap.set_frame_vm_rights(vm_rights as usize);
-        return new_cap;
+        new_cap
     } else {
         cap.clone()
     }

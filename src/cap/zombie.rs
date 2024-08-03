@@ -18,19 +18,19 @@ impl cap_t {
         if _type == ZombieType_ZombieTCB {
             return TCB_CNODE_RADIX;
         }
-        return ZombieType_ZombieCNode(_type);
+        ZombieType_ZombieCNode(_type)
     }
 
     #[inline]
     pub fn get_zombie_ptr(&self) -> usize {
         let radix = self.get_zombie_bit();
-        return self.get_zombie_id() & !MASK!(radix + 1);
+        self.get_zombie_id() & !MASK!(radix + 1)
     }
 
     #[inline]
     pub fn get_zombie_number(&self) -> usize {
         let radix = self.get_zombie_bit();
-        return self.get_zombie_id() & MASK!(radix + 1);
+        self.get_zombie_id() & MASK!(radix + 1)
     }
 
     #[inline]
@@ -43,17 +43,16 @@ impl cap_t {
 
 #[inline]
 pub fn Zombie_new(number: usize, _type: usize, ptr: usize) -> cap_t {
-    let mask: usize;
-    if _type == ZombieType_ZombieTCB {
-        mask = MASK!(TCB_CNODE_RADIX + 1);
+    let mask = if _type == ZombieType_ZombieTCB {
+        MASK!(TCB_CNODE_RADIX + 1)
     } else {
-        mask = MASK!(_type + 1);
-    }
-    return cap_t::new_zombie_cap((ptr & !mask) | (number & mask), _type);
+        MASK!(_type + 1)
+    };
+    cap_t::new_zombie_cap((ptr & !mask) | (number & mask), _type)
 }
 
 pub fn ZombieType_ZombieCNode(n: usize) -> usize {
-    return n & MASK!(wordRadix);
+    n & MASK!(wordRadix)
 }
 
 ///判断是否为循环`zombie cap`,指向自身且类型为`CapZombieCap`（似乎只有`CNode Capability`指向自己才会出现这种情况）

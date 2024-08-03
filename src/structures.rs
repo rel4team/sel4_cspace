@@ -31,19 +31,10 @@ impl Default for finaliseSlot_ret {
 }
 
 #[repr(C)]
-#[derive(Debug, PartialEq, Clone, Copy)]
+#[derive(Debug, PartialEq, Clone, Copy, Default)]
 pub struct finaliseCap_ret {
     pub remainder: cap_t,
     pub cleanupInfo: cap_t,
-}
-
-impl Default for finaliseCap_ret {
-    fn default() -> Self {
-        finaliseCap_ret {
-            remainder: cap_t::default(),
-            cleanupInfo: cap_t::default(),
-        }
-    }
 }
 
 #[repr(C)]
@@ -59,7 +50,7 @@ impl Default for resolveAddressBits_ret_t {
     fn default() -> Self {
         resolveAddressBits_ret_t {
             status: exception_t::EXCEPTION_NONE,
-            slot: 0 as *mut cte_t,
+            slot: core::ptr::null_mut::<cte_t>(),
             bitsRemaining: 0,
         }
     }
