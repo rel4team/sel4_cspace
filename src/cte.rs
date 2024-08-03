@@ -82,11 +82,11 @@ impl cte_t {
                 return exception_t::EXCEPTION_SYSCALL_ERROR;
             }
         }
-        return exception_t::EXCEPTION_NONE;
+        exception_t::EXCEPTION_NONE
     }
     /// 判断当前`cte`是否为`next`节点的父节点（除了父节点，还有兄弟节点的关系可能）
     fn is_mdb_parent_of(&self, next: &Self) -> bool {
-        if !(self.cteMDBNode.get_revocable() != 0) {
+        if self.cteMDBNode.get_revocable() == 0 {
             return false;
         }
         if !same_region_as(&self.cap, &next.cap) {
@@ -99,8 +99,7 @@ impl cte_t {
                 if badge == 0 {
                     return true;
                 }
-                return badge == next.cap.get_ep_badge()
-                    && !(next.cteMDBNode.get_first_badged() != 0);
+                badge == next.cap.get_ep_badge() && next.cteMDBNode.get_first_badged() == 0
             }
             CapTag::CapNotificationCap => {
                 assert_eq!(next.cap.get_cap_type(), CapTag::CapNotificationCap);
@@ -108,8 +107,7 @@ impl cte_t {
                 if badge == 0 {
                     return true;
                 }
-                return badge == next.cap.get_nf_badge()
-                    && !(next.cteMDBNode.get_first_badged() != 0);
+                badge == next.cap.get_nf_badge() && next.cteMDBNode.get_first_badged() == 0
             }
             _ => true,
         }
@@ -127,14 +125,13 @@ impl cte_t {
         };
 
         if prev_is_same_obj {
-            false
+            return false;
+        }
+        if mdb.get_next() == 0 {
+            true
         } else {
-            if mdb.get_next() == 0 {
-                true
-            } else {
-                let next = convert_to_type_ref::<cte_t>(mdb.get_next());
-                return !same_object_as(&self.cap, &next.cap);
-            }
+            let next = convert_to_type_ref::<cte_t>(mdb.get_next());
+            !same_object_as(&self.cap, &next.cap)
         }
     }
 
@@ -142,10 +139,10 @@ impl cte_t {
         if self.cap.get_cap_type() == CapTag::CapNullCap || !self.is_final_cap() {
             return false;
         }
-        match self.cap.get_cap_type() {
-            CapTag::CapThreadCap | CapTag::CapZombieCap | CapTag::CapCNodeCap => true,
-            _ => false,
-        }
+        matches!(
+            self.cap.get_cap_type(),
+            CapTag::CapThreadCap | CapTag::CapZombieCap | CapTag::CapCNodeCap
+        )
     }
 
     ///清除`cte slot`中的`capability`
@@ -203,7 +200,7 @@ impl cte_t {
         if exposed || fs_ret.success {
             self.set_empty(&fs_ret.cleanupInfo);
         }
-        return exception_t::EXCEPTION_NONE;
+        exception_t::EXCEPTION_NONE
     }
 
     /// 将当前的`cte slot`中的能力清除,要求`cap`是可删除的
@@ -331,7 +328,7 @@ impl cte_t {
                 return status;
             }
         }
-        return exception_t::EXCEPTION_NONE;
+        exception_t::EXCEPTION_NONE
     }
 }
 
@@ -354,8 +351,8 @@ pub fn cte_insert(new_cap: &cap_t, src_slot: &mut cte_t, dest_slot: &mut cte_t) 
 
     setUntypedCapAsFull(srcCap, new_cap, src_slot);
 
-    (*dest_slot).cap = new_cap.clone();
-    (*dest_slot).cteMDBNode = newMDB;
+    dest_slot.cap = new_cap.clone();
+    dest_slot.cteMDBNode = newMDB;
     src_slot
         .cteMDBNode
         .set_next(dest_slot as *const cte_t as usize);
@@ -371,12 +368,7 @@ pub fn cte_insert(new_cap: &cap_t, src_slot: &mut cte_t, dest_slot: &mut cte_t) 
 pub fn insert_new_cap(parent: &mut cte_t, slot: &mut cte_t, cap: &cap_t) {
     let next = parent.cteMDBNode.get_next();
     slot.cap = cap.clone();
-    slot.cteMDBNode = mdb_node_t::new(
-        next as usize,
-        1usize,
-        1usize,
-        parent as *const cte_t as usize,
-    );
+    slot.cteMDBNode = mdb_node_t::new(next, 1usize, 1usize, parent as *const cte_t as usize);
     if next != 0 {
         let next_ref = convert_to_mut_type_ref::<cte_t>(next);
         next_ref.cteMDBNode.set_prev(slot as *const cte_t as usize);
@@ -459,14 +451,12 @@ pub fn cte_swap(cap1: &cap_t, slot1: &mut cte_t, cap2: &cap_t, slot2: &mut cte_t
 #[inline]
 fn cap_removable(cap: &cap_t, slot: *mut cte_t) -> bool {
     match cap.get_cap_type() {
-        CapTag::CapNullCap => {
-            return true;
-        }
+        CapTag::CapNullCap => true,
         CapTag::CapZombieCap => {
             let n = cap.get_zombie_number();
             let ptr = cap.get_zombie_ptr();
             let z_slot = ptr as *mut cte_t;
-            return n == 0 || (n == 1 && slot == z_slot);
+            n == 0 || (n == 1 && slot == z_slot)
         }
         _ => {
             panic!("Invalid cap type , finaliseCap should only return Zombie or NullCap");

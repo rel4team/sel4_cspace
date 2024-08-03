@@ -216,7 +216,7 @@ pub fn arch_mask_cap_rights(rights: seL4_CapRights_t, cap: &cap_t) -> cap_t {
         vm_rights = maskVMRights(vm_rights, rights);
         let mut new_cap = cap.clone();
         new_cap.set_frame_vm_rights(vm_rights as usize);
-        return new_cap;
+        new_cap
     } else {
         cap.clone()
     }
@@ -268,12 +268,10 @@ pub fn arch_same_region_as(cap1: &cap_t, cap2: &cap_t) -> bool {
 }
 
 pub fn arch_same_object_as(cap1: &cap_t, cap2: &cap_t) -> bool {
-    if cap1.get_cap_type() == CapTag::CapFrameCap {
-        if cap2.get_cap_type() == CapTag::CapFrameCap {
-            return cap1.get_frame_base_ptr() == cap2.get_frame_base_ptr()
-                && cap1.get_frame_size() == cap2.get_frame_size()
-                && cap1.get_frame_is_device() == cap2.get_frame_is_device();
-        }
+    if cap1.get_cap_type() == CapTag::CapFrameCap && cap2.get_cap_type() == CapTag::CapFrameCap {
+        return cap1.get_frame_base_ptr() == cap2.get_frame_base_ptr()
+            && cap1.get_frame_size() == cap2.get_frame_size()
+            && cap1.get_frame_is_device() == cap2.get_frame_is_device();
     }
     arch_same_region_as(cap1, cap2)
 }

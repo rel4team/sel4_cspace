@@ -154,18 +154,18 @@ impl cap_t {
     }
 
     pub fn get_cap_is_physical(&self) -> bool {
-        match self.get_cap_type() {
+        matches!(
+            self.get_cap_type(),
             CapTag::CapUntypedCap
-            | CapTag::CapEndpointCap
-            | CapTag::CapNotificationCap
-            | CapTag::CapCNodeCap
-            | CapTag::CapFrameCap
-            | CapTag::CapASIDPoolCap
-            | CapTag::CapPageTableCap
-            | CapTag::CapZombieCap
-            | CapTag::CapThreadCap => true,
-            _ => false,
-        }
+                | CapTag::CapEndpointCap
+                | CapTag::CapNotificationCap
+                | CapTag::CapCNodeCap
+                | CapTag::CapFrameCap
+                | CapTag::CapASIDPoolCap
+                | CapTag::CapPageTableCap
+                | CapTag::CapZombieCap
+                | CapTag::CapThreadCap
+        )
     }
 
     pub fn isArchCap(&self) -> bool {
@@ -186,7 +186,7 @@ pub fn same_region_as(cap1: &cap_t, cap2: &cap_t) -> bool {
                 return (aBase <= bBase) && (bTop <= aTop) && (bBase <= bTop);
             }
 
-            return false;
+            false
         }
 
         CapTag::CapEndpointCap
@@ -212,19 +212,19 @@ pub fn same_region_as(cap1: &cap_t, cap2: &cap_t) -> bool {
             }
             false
         }
-        CapTag::CapIrqControlCap => match cap2.get_cap_type() {
-            CapTag::CapIrqControlCap | CapTag::CapIrqHandlerCap => true,
-            _ => false,
-        },
+        CapTag::CapIrqControlCap => {
+            matches!(
+                cap2.get_cap_type(),
+                CapTag::CapIrqControlCap | CapTag::CapIrqHandlerCap
+            )
+        }
         CapTag::CapIrqHandlerCap => {
             if cap2.get_cap_type() == CapTag::CapIrqHandlerCap {
                 return cap1.get_irq_handler() == cap2.get_irq_handler();
             }
             false
         }
-        _ => {
-            return false;
-        }
+        _ => false,
     }
 }
 
@@ -257,21 +257,17 @@ pub fn is_cap_revocable(derived_cap: &cap_t, src_cap: &cap_t) -> bool {
     match derived_cap.get_cap_type() {
         CapTag::CapEndpointCap => {
             assert_eq!(src_cap.get_cap_type(), CapTag::CapEndpointCap);
-            return derived_cap.get_ep_badge() != src_cap.get_ep_badge();
+            derived_cap.get_ep_badge() != src_cap.get_ep_badge()
         }
 
         CapTag::CapNotificationCap => {
             assert_eq!(src_cap.get_cap_type(), CapTag::CapNotificationCap);
-            return derived_cap.get_nf_badge() != src_cap.get_nf_badge();
+            derived_cap.get_nf_badge() != src_cap.get_nf_badge()
         }
 
-        CapTag::CapIrqHandlerCap => {
-            return src_cap.get_cap_type() == CapTag::CapIrqControlCap;
-        }
+        CapTag::CapIrqHandlerCap => src_cap.get_cap_type() == CapTag::CapIrqControlCap,
 
-        CapTag::CapUntypedCap => {
-            return true;
-        }
+        CapTag::CapUntypedCap => true,
 
         _ => false,
     }
